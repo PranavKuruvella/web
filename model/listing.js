@@ -1,8 +1,8 @@
-const mongoose = require("mongoose")
-const Review = require("./review.js")
-const schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Review = require("./review.js");
+const Schema = mongoose.Schema; // ✅ Corrected uppercase Schema
 
-const listingSchema = new schema({
+const listingSchema = new Schema({
     title: {
         type: String,
         required: true,
@@ -10,20 +10,20 @@ const listingSchema = new schema({
     description: String,
     image: {
         type: String,
-        default: "https://unsplash.com/photos/a-dirt-road-in-the-middle-of-a-forest-1b2uK_-uPIo",
-        set: (v) => v === "" ? "https://unsplash.com/photos/a-dirt-road-in-the-middle-of-a-forest-1b2uK_-uPIo" : v,
+        default: "https://source.unsplash.com/600x400/?nature,landscape", // ✅ Fixed Unsplash URL
+        set: (v) => v === "" ? "https://source.unsplash.com/600x400/?nature,landscape" : v,
     },
     price: Number,
     location: String,
     country: String,
     reviews: [
         {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Review', // Reference the Review model by its name as a string
-        }
-    ], 
-})
+          type: Schema.Types.ObjectId,
+          ref: "Review",
+        },
+      ],
+});
 
-const Listing = mongoose.model('Listing', listingSchema)
+const Listing = mongoose.model('Listing', listingSchema);
 
-module.exports = Listing; // Remove the trailing period
+module.exports = Listing;
