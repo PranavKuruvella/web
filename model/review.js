@@ -1,18 +1,23 @@
 const { string, number } = require("joi")
-const mongoose = require("mongoose")
-const schema = mongoose.Schema
+const mongoose = require("mongoose");
+const Schema = mongoose.Schema;
 
-const reviewSchema = new schema({
-    comment: String,
+const reviewSchema = new Schema({
+    comment : String,
     rating: {
-        type: Number,
+        type:Number,
         min: 1,
-        max: 5
+        max: 5,
     },
     createdAt: {
         type: Date, 
-        default: Date.now()
+        default: Date.now(),
+    },
+    author: {
+        type: Schema.Types.ObjectId,
+        ref: "User",
     }
-})
+});
 
-module.exports = mongoose.model("Review",reviewSchema)
+const Review = mongoose.model("Review", reviewSchema);
+module.exports = Review;

@@ -10,8 +10,9 @@ const expressError = require("./utils/expressError.js")
 const { listingSchema, reviewSchema } = require("./schema.js")
 const Review = require('./model/review')
 
-app.listen(8080, () => {
-    console.log("listening at port 8080");
+let port = 3000
+app.listen(port, () => {
+    console.log(`listening at port ${port}`);
 
 })
 const validateLisitng = (req, res, next) => {
@@ -33,7 +34,7 @@ const validateReview = ((req, res, next) => {
     }
 });
 
-mongo_url = "mongodb://127.0.0.1:27017/wanderlust"
+mongo_url = "mongodb://127.0.0.1:27017/pranavProject"
 async function main() {
     await mongoose.connect(mongo_url)
 }
@@ -78,8 +79,12 @@ app.post('/listings', validateLisitng, wrapAsync(async (req, res, next) => {
 // Show Route
 app.get("/listings/:id", wrapAsync(async (req, res) => {
     let { id } = req.params;
-    const listing = await Listing.findById(id).populate("reviews");
-    res.render("listings/show.ejs", { listing });
+    
+    let listing = await Listing.findById(id).populate('reviews');
+    if (!listing) {
+        throw new Error('Listing not found');
+    }
+    res.render('listings/show.ejs', { listing });
 }));
 
 //edit route
@@ -106,25 +111,20 @@ app.delete("/listings/:id", wrapAsync(async (req, res) => {
 
 //reviews route
 app.post("/listings/:id/reviews", validateReview, wrapAsync(async (req, res) => {
-    let { id } = req.params
-    let { review } = req.body
-    let newreview = new Review({
-        comment: review.comment,
-        rating: review.rating,
-    })
-    let listing = await Listing.findById(id)
-    if (!listing) {
-        throw new Error('listing not found')
-    }
-    if (!listing.reviews) {
-        listing.reviews = []
-    }
-    listing.reviews.push(newreview)
-    await listing.save()
-    console.log(newreview);
-    res.redirect(`/listings/${id}`)
+    let listing = await Listing.findById(req.params.id);
+  
+    let newReview = new Review(req.body.review);
+    console.log(newReview);
+  
+    listing.reviews.push(newReview);
+  
+    await newReview.save();
+    await listing.save();
+  
+    res.redirect(`/listings/${listing.id}`);
+}));
 
-}))
+
 
 app.get("*", (req, res, next) => { // if user tries to access pages of no route
     next(new expressError(404, `Page not Found`))
